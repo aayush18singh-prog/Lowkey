@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lowkey — Not confirmed. Definitely discussed.</title>
+    <!-- Tailwind CSS for high-fidelity utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons for premium, minimal indicators -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Space Grotesk (Premium Geometric) & Plus Jakarta Sans (Highly Legible Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Confetti Library for high-fidelity Spread feedback -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --apple-bg: #09090b; /* Pure space black */
+            --apple-card: #18181b; /* Sophisticated zinc gray */
+            --apple-border: rgba(255, 255, 255, 0.08);
+            --apple-tint: #ff453a; /* Deep premium coral */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--apple-bg);
+            color: #f4f4f5;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Fluid transitions inspired by iOS spring physics */
+        .ios-spring {
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .haptic-tap {
+            transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .haptic-tap:active {
+            transform: scale(0.96);
+        }
+
+        /* Overlapping stack styles for Gossip cards */
+        .card-stack-item {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.4s ease;
+            will-change: transform, opacity;
+        }
+
+        /* Swipe left flyaway animation */
+        .swipe-left-exit {
+            transform: translate(-160%, 15%) rotate(-30deg) !important;
+            opacity: 0 !important;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+        }
+
+        /* Custom soft radial glow backgrounds */
+        .ambient-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(255, 69, 58, 0.15) 0%, rgba(9, 9, 11, 0) 70%);
+            pointer-events: none;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex justify-center items-center select-none bg-black">
+
+    <!-- Subtle iOS Ambient Light Glow -->
+    <div class="fixed inset-0 ambient-glow z-0"></div>
+
+    <!-- Main Mobile Application Container (Sleek Apple Mockup Border on Desktop, Seamless on Mobile) -->
+    <div class="relative z-10 w-full max-w-[430px] h-screen md:h-[880px] md:rounded-[48px] md:border-[8px] md:border-zinc-800 bg-[#09090b] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col justify-between">
+        
+        <!-- Apple Dynamic Status Bar Mimic -->
+        <header class="px-6 pt-5 pb-3 flex justify-center items-center text-xs font-semibold text-zinc-500 relative z-30">
+            <!-- Intimate Brand Label -->
+            <div class="flex flex-col items-center">
+                <span class="font-display text-2xl font-bold tracking-tight text-white">LOWKEY</span>
+                <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-medium">Not confirmed. Definitely discussed.</span>
+            </div>
+        </header>
+
+        <!-- Main Swipable Viewport Window -->
+        <main class="flex-grow relative overflow-hidden z-20">
+            <div id="viewport-slider" class="h-full flex ios-spring" style="width: 500%; transform: translateX(0%);">
+                
+                <!-- 1. HOME TAB (Gossip Card Stack) -->
+                <section class="w-1/5 h-full px-6 flex flex-col justify-between py-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-display">⚡ GOSSIP DECK</span>
+                        <span class="text-[11px] bg-red-500/10 text-red-400 px-2.5 py-1 rounded-full font-semibold border border-red-500/20 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Live Feed
+                        </span>
+                    </div>
+
+                    <!-- Overlapping Tactile Card Stack -->
+                    <div class="relative w-full h-[460px] flex items-center justify-center my-auto">
+                        <div id="deck-wrapper" class="relative w-full h-full">
+                            <!-- Populated Dynamically via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Swipe Tip & Mini Indicator -->
+                    <div class="text-center py-1">
+                        <p class="text-[10px] uppercase tracking-widest font-semibold text-zinc-500 flex justify-center items-center gap-2">
+                            <span>Swipe card left to see next whisper</span>
+                            <i class="fa-solid fa-arrow-left text-zinc-600"></i>
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 2. TRENDING TAB (Apple News Style Minimalist Feeds) -->
+                <section class="w-1/5 h-full px-6 py-2 overflow-y-auto no-scrollbar flex flex-col justify-start space-y-6">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-display">📈 NOW TRENDING</span>
+                        <h2 class="text-3xl font-bold tracking-tight text-white font-display">The Red Hot List</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Trending Item 1 -->
+                        <div onclick="promoteTrending(1)" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-lg hover:border-white/10 transition-all cursor-pointer">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-zinc-400">
+                                <span>#1 VENTURES</span>
+                                <span class="text-red-400 font-display">🔥 STILL STIRRING UP</span>
+                            </div>
+                            <p class="text-base font-bold leading-relaxed text-white">That Gurugram SaaS founder was locked out of his own Slack workspace after drinking too much cold brew at the annual offsite.</p>
+                            <div class="flex justify-between items-center text-xs text-zinc-500 pt-2 border-t border-white/5">
+                                <span>452 people discussing</span>
+                                <span class="font-bold text-red-400">Boost Now →</span>
+                            </div>
+                        </div>
+
+                        <!-- Trending Item 2 -->
+                        <div onclick="promoteTrending(2)" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-lg hover:border-white/10 transition-all cursor-pointer">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-zinc-400">
+                                <span>#2 BOLLYWOOD</span>
+                                <span class="text-emerald-400">🟢 LOWKEY VERIFIED</span>
+                            </div>
+                            <p class="text-base font-bold leading-relaxed text-white">Bandra's favorite rising indie star was spotted rehearsing their grand apology video with a ring light inside an organic cafe.</p>
+                            <div class="flex justify-between items-center text-xs text-zinc-500 pt-2 border-t border-white/5">
+                                <span>211 people discussing</span>
+                                <span class="font-bold text-red-400">Boost Now →</span>
+                            </div>
+                        </div>
+
+                        <!-- Trending Item 3 -->
+                        <div onclick="promoteTrending(3)" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-lg hover:border-white/10 transition-all cursor-pointer">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-zinc-400">
+                                <span>#3 KITTY PARTY</span>
+                                <span class="text-yellow-400">🟡 DEFINITELY DISCUSSED</span>
+                            </div>
+                            <p class="text-base font-bold leading-relaxed text-white">Pammi Auntie was heard complaining that the neighborhood solar panel inverter is being tapped to run a secret crypto rig.</p>
+                            <div class="flex justify-between items-center text-xs text-zinc-500 pt-2 border-t border-white/5">
+                                <span>188 people discussing</span>
+                                <span class="font-bold text-red-400">Boost Now →</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. COMMUNITIES TAB (Minimal Grid Channels) -->
+                <section class="w-1/5 h-full px-6 py-2 overflow-y-auto no-scrollbar flex flex-col justify-start space-y-6">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-display">💬 NEIGHBORHOODS</span>
+                        <h2 class="text-3xl font-bold tracking-tight text-white font-display">Communities</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="openCommunity('c/hsr-layout')" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between h-[150px] cursor-pointer hover:border-white/10 shadow-md">
+                            <span class="text-2xl text-red-400 font-display font-bold">hsr</span>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">c/hsr-layout</h4>
+                                <p class="text-[10px] text-zinc-500 mt-1">Tech bro drama</p>
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunity('c/bandra-west')" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between h-[150px] cursor-pointer hover:border-white/10 shadow-md">
+                            <span class="text-2xl text-violet-400 font-display font-bold">bdr</span>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">c/bandra-west</h4>
+                                <p class="text-[10px] text-zinc-500 mt-1">Bollywood whispers</p>
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunity('c/south-delhi')" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between h-[150px] cursor-pointer hover:border-white/10 shadow-md">
+                            <span class="text-2xl text-emerald-400 font-display font-bold">del</span>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">c/south-delhi</h4>
+                                <p class="text-[10px] text-zinc-500 mt-1">High society tea</p>
+                            </div>
+                        </div>
+
+                        <div onclick="openCommunity('c/indiranagar')" class="haptic-tap bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-between h-[150px] cursor-pointer hover:border-white/10 shadow-md">
+                            <span class="text-2xl text-amber-400 font-display font-bold">ind</span>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">c/indiranagar</h4>
+                                <p class="text-[10px] text-zinc-500 mt-1">Pub & startup leaks</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. PROFILE TAB (Premium Identity Cards) -->
+                <section class="w-1/5 h-full px-6 py-2 overflow-y-auto no-scrollbar flex flex-col justify-start space-y-6">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-display">💎 ANONYMOUS PASS</span>
+                        <h2 class="text-3xl font-bold tracking-tight text-white font-display">Your Vibe Card</h2>
+                    </div>
+
+                    <!-- Apple Style Premium Holographic Glass Identity Card -->
+                    <div class="relative bg-gradient-to-tr from-zinc-800 to-zinc-900 border border-white/10 rounded-[32px] p-6 shadow-2xl overflow-hidden flex flex-col justify-between h-[230px]">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent)]"></div>
+                        <div class="flex justify-between items-start">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest">AGENT STATUS</span>
+                                <span class="text-xl font-bold text-white font-display mt-0.5">Top-Tier Lurker</span>
+                            </div>
+                            <span class="w-10 h-10 rounded-full bg-zinc-700/50 flex items-center justify-center border border-white/10 text-white">
+                                <i class="fa-solid fa-signature"></i>
+                            </span>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs text-zinc-500 font-mono tracking-wider">SECURE ID: LWK-882-901</p>
+                            <p class="text-xs font-medium text-zinc-300">Member since early afternoon today</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-center h-24">
+                            <span class="text-2xl font-bold text-white font-display" id="user-spills-counter">0</span>
+                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-1">Spilled Drama</span>
+                        </div>
+                        <div class="bg-[#1c1c1e] border border-white/5 rounded-3xl p-5 flex flex-col justify-center h-24">
+                            <span class="text-2xl font-bold text-white font-display" id="user-spreads-counter">14</span>
+                            <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-1">Spreads & Likes</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. CHATS TAB (Intimate Direct Group Chats) -->
+                <section class="w-1/5 h-full px-6 py-2 overflow-y-auto no-scrollbar flex flex-col justify-start space-y-6">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-display">🔒 PRIVATE CHANNELS</span>
+                        <h2 class="text-3xl font-bold tracking-tight text-white font-display">Secure Chats</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div onclick="openSecureChat('Sita Auntie\'s Spy Network')" class="haptic-tap bg-[#1c1c1e] hover:bg-zinc-800/50 rounded-3xl p-4 flex items-center justify-between cursor-pointer border border-white/5 transition-all">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold font-display text-sm">SA</div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-white">Sita Auntie's Spy Network</span>
+                                    <p class="text-[11px] text-zinc-500 mt-0.5 truncate max-w-[170px]">"Did you hear about Sharma ji's cook?"</p>
+                                </div>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                        </div>
+
+                        <div onclick="openSecureChat('HSR Layout Founders Pool')" class="haptic-tap bg-[#1c1c1e] hover:bg-zinc-800/50 rounded-3xl p-4 flex items-center justify-between cursor-pointer border border-white/5 transition-all">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold font-display text-sm">FP</div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-white">HSR Founders Pool</span>
+                                    <p class="text-[11px] text-zinc-500 mt-0.5 truncate max-w-[170px]">"Who's paying with raw equity?"</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-zinc-500">2h ago</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- Bottom Action Panels (Minimal & Tactile Controllers) -->
+        <footer class="relative z-30 px-6 pb-6 pt-1 bg-[#09090b]/95 backdrop-blur-xl flex flex-col space-y-4">
+            
+            <!-- Contextual Actions (Shown under the Gossip Deck dynamically) -->
+            <div id="deck-actions" class="flex items-center justify-between gap-4">
+                <!-- Drop New Secret Spill Wizard (+) -->
+                <button onclick="openSpillWizard()" class="haptic-tap flex-1 py-4 bg-gradient-to-tr from-violet-600 to-fuchsia-600 hover:brightness-110 rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-plus text-xl text-white"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-wider mt-1 text-white font-display">SPILL NEW</span>
+                </button>
+
+                <!-- Spread & Boost Gossip (🔥) -->
+                <button onclick="triggerSpreadActive()" class="haptic-tap flex-1 py-4 bg-gradient-to-tr from-[#ff3300] to-[#ff2d55] hover:brightness-110 rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-fire text-2xl text-white"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-wider mt-1 text-white font-display">SPREAD VIRAL</span>
+                </button>
+            </div>
+
+            <!-- iOS Home Indicator bar mimicking Apple layouts -->
+            <div class="w-32 h-1 bg-zinc-800 rounded-full mx-auto"></div>
+        </footer>
+
+    </div>
+
+    <!-- Apple-style Premium Slide-up Custom Modal (Spill Drama) -->
+    <div id="spill-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md pointer-events-none opacity-0 transition-all duration-500 flex items-end justify-center">
+        <div id="spill-modal-card" class="bg-[#18181b] border-t border-white/10 rounded-t-[40px] w-full max-w-[430px] p-8 space-y-6 transform translate-y-full transition-transform duration-500 relative shadow-[0_-15px_40px_rgba(0,0,0,0.8)]">
+            
+            <!-- Handle indicator for dragging/sliding down -->
+            <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-2 cursor-pointer" onclick="closeSpillWizard()"></div>
+
+            <div>
+                <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest font-display">DROP SECRET SECURELY</span>
+                <h3 class="text-3xl font-bold text-white tracking-tight font-display mt-0.5">Spill Your Drama</h3>
+            </div>
+
+            <form id="spill-wizard-form" onsubmit="submitNewGossip(event)" class="space-y-5">
+                
+                <!-- Text Area Content -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Secret Scoop Text</label>
+                    <textarea id="spill-text" required minlength="15" maxlength="400" rows="4"
+                              placeholder="e.g., That famous South Delhi influencer was heard screaming at her driver in perfect, fluent Haryanvi..."
+                              class="w-full bg-zinc-900 border border-white/10 rounded-2xl p-4 text-sm font-medium text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-all resize-none"></textarea>
+                    <div class="flex justify-between text-[10px] font-bold text-zinc-500">
+                        <span>Min 15 characters</span>
+                        <span id="spill-char-counter">0/400</span>
+                    </div>
+                </div>
+
+                <!-- Fields Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-zinc-900 border border-white/5 p-4 rounded-2xl">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">SPICE LEVEL</label>
+                        <select id="spill-drama" class="w-full bg-transparent text-xs text-orange-400 font-extrabold focus:outline-none cursor-pointer">
+                            <option value="1" class="bg-zinc-900 text-white">🌶️ Mild Scoop</option>
+                            <option value="2" class="bg-zinc-900 text-white" selected>🌶️🌶️ High Drama</option>
+                            <option value="3" class="bg-zinc-900 text-white">🌶️🌶️🌶️ Nuclear</option>
+                        </select>
+                    </div>
+
+                    <div id="spill-state-box" class="bg-zinc-900 border border-white/5 p-4 rounded-2xl transition-colors duration-300">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">GOSSIP STATE</label>
+                        <select id="spill-state" onchange="updateStateHighlight()" class="w-full bg-transparent text-xs font-extrabold focus:outline-none cursor-pointer">
+                            <option value="LOWKEY VERIFIED" class="bg-zinc-900 text-white" selected>LOWKEY VERIFIED</option>
+                            <option value="DEFINITELY DISCUSSED" class="bg-zinc-900 text-white">DEFINITELY DISCUSSED</option>
+                            <option value="STILL STIRRING UP" class="bg-zinc-900 text-white">STILL STIRRING UP</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Launch Button -->
+                <button type="submit" class="haptic-tap w-full py-4 bg-gradient-to-tr from-[#ff3300] to-[#ff2d55] text-white font-bold rounded-2xl border border-white/10 hover:brightness-110 text-sm uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span class="font-display">Launch Into Deck</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Micro-Notification Toast System -->
+    <div id="toast-messenger" class="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/90 border border-white/10 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 pointer-events-none transform translate-y-[-100px] opacity-0 transition-all duration-500 backdrop-blur-md">
+        <span class="text-base" id="toast-icon">✨</span>
+        <span id="toast-text" class="font-bold">Toast notification content</span>
+    </div>
+
+    <!-- Client-Side Javascript Application Code -->
+    <script>
+        // High-fidelity pre-configured gossip database
+        const database = [
+            {
+                id: 1,
+                snippet: "A friend of mine cheated on his fiancée on his bachelor trip, and as an act of forgiveness, he asked his wife to do the same.",
+                drama: 3,
+                state: "LOWKEY VERIFIED",
+                gradientClass: "from-[#ff2d55] via-purple-600 to-indigo-600",
+                clout: 342
+            },
+            {
+                id: 2,
+                snippet: "I've heard that a senior professional at an advertising company has been double-timing his wife, and the rumored lady is apparently in the middle of her own divorce.",
+                drama: 3,
+                state: "STILL STIRRING UP",
+                gradientClass: "from-orange-500 via-rose-500 to-[#ff2d55]",
+                clout: 890
+            },
+            {
+                id: 3,
+                snippet: "A big Indian industrialist, back in his boarding school days, was apparently heard having a fling with one of his teachers.",
+                drama: 2,
+                state: "DEFINITELY DISCUSSED",
+                gradientClass: "from-emerald-500 via-teal-500 to-indigo-500",
+                clout: 120
+            },
+            {
+                id: 4,
+                snippet: "A friend of mine worked on the set of a big Bollywood action film, and apparently the lead actress can't stand her self-obsessed co-star, who kept cutting takes just to fix his hair.",
+                drama: 2,
+                state: "DEFINITELY DISCUSSED",
+                gradientClass: "from-indigo-600 via-pink-600 to-[#ff2d55]",
+                clout: 211
+            },
+            {
+                id: 5,
+                snippet: "Unpopular opinion, but a well-known Indian content creator in the storytelling/interview space is one of the worst to work with — classist, and only cares about monetizing every situation.",
+                drama: 2,
+                state: "STILL STIRRING UP",
+                gradientClass: "from-purple-700 via-pink-600 to-[#ff453a]",
+                clout: 405
+            },
+            {
+                id: 6,
+                snippet: "Many Indian influencers are clearly advocating for an 'equal stage' but can't stand sharing the spotlight with tier 2-3 influencers who've made it to the top. Huge hypocrites.",
+                drama: 2,
+                state: "LOWKEY VERIFIED",
+                gradientClass: "from-teal-600 via-emerald-500 to-cyan-500",
+                clout: 178
+            }
+        ];
+
+        // Global System States
+        let currentCardIndex = 0;
+        let activeTabIndex = 0;
+        let userSpillsCount = 0;
+        let userSpreadsCount = 14;
+
+        // Swiper gesture tracking
+        let activeCardRef = null;
+        let isSwiping = false;
+        let startX = 0;
+        let deltaX = 0;
+
+        window.onload = function() {
+            renderDeckStack();
+            setupTextCounter();
+            setupGestureSwiper();
+        };
+
+        // Swipe & Navigation Controller between Home, Trending, Communities, Profile, Chats
+        function setActiveTab(tabIndex) {
+            activeTabIndex = tabIndex;
+            const slider = document.getElementById('viewport-slider');
+            slider.style.transform = `translateX(-${tabIndex * 20}%)`;
+
+            // Update bottom tab highlights with Apple elegant monochromatic highlights
+            for (let i = 0; i <= 4; i++) {
+                const navBtn = document.getElementById(`nav-tab-${i}`);
+                if (navBtn) {
+                    if (i === tabIndex) {
+                        navBtn.className = "haptic-tap flex flex-col items-center space-y-1 text-red-400";
+                    } else {
+                        navBtn.className = "haptic-tap flex flex-col items-center space-y-1 text-zinc-500 hover:text-white";
+                    }
+                }
+            }
+
+            // Hide or show the direct context deck-actions based on current tab
+            const deckActions = document.getElementById('deck-actions');
+            if (tabIndex === 0) {
+                deckActions.style.opacity = '1';
+                deckActions.style.pointerEvents = 'auto';
+            } else {
+                deckActions.style.opacity = '0.1';
+                deckActions.style.pointerEvents = 'none';
+            }
+
+            // Simulate Apple micro-haptic nudge feedback
+            triggerLightHaptic();
+        }
+
+        // Render overlapping deck with Apple-style fluid layers
+        function renderDeckStack() {
+            const container = document.getElementById('deck-wrapper');
+            container.innerHTML = '';
+
+            if (database.length === 0) {
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-zinc-900/60 border border-white/5 rounded-[40px] flex flex-col items-center justify-center p-8 text-center backdrop-blur-md shadow-2xl">
+                        <span class="text-4xl mb-3">🤫</span>
+                        <h4 class="font-display font-bold text-xl text-white uppercase tracking-tight">Deck is Empty</h4>
+                        <p class="text-xs text-zinc-500 mt-2 max-w-[220px] leading-relaxed">You've swiped through all local drama. Spill some fresh secrets to populate the queue!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const visibleCardsCount = 3; 
+            for (let i = visibleCardsCount - 1; i >= 0; i--) {
+                const targetIndex = (currentCardIndex + i) % database.length;
+                const gossip = database[targetIndex];
+                
+                const card = document.createElement('div');
+                
+                // Spring scale and translate calculations mimicking physical cards
+                const scale = 1 - (i * 0.05);
+                const translateY = i * 16;
+                const zIndex = 100 - i;
+                const opacity = 1 - (i * 0.25);
+
+                card.className = `absolute inset-0 bg-gradient-to-tr ${gossip.gradientClass} rounded-[40px] p-8 shadow-[0_20px_45px_rgba(0,0,0,0.6)] flex flex-col justify-between card-stack-item z-[${zIndex}]`;
+                card.id = `deck-card-${targetIndex}`;
+                card.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                card.style.opacity = opacity;
+
+                if (i > 0) {
+                    card.style.pointerEvents = 'none';
+                }
+
+                // Compile Drama level chilies
+                let chilis = '';
+                for (let d = 0; d < gossip.drama; d++) {
+                    chilis += '🌶️';
+                }
+
+                // State Pill color logic
+                let statusColor = "bg-emerald-400 text-black";
+                if (gossip.state === "STILL STIRRING UP") statusColor = "bg-[#ff2d55] text-white";
+                if (gossip.state === "DEFINITELY DISCUSSED") statusColor = "bg-amber-400 text-black";
+
+                // Ultra-Premium, Content-First Typographic Layout
+                card.innerHTML = `
+                    <div class="flex justify-between items-center select-none">
+                        <span class="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${statusColor}">
+                            ● ${gossip.state}
+                        </span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-white/50">ANONYMOUS</span>
+                    </div>
+
+                    <div class="flex-grow flex flex-col justify-center py-4">
+                        <p class="text-xl md:text-2xl font-bold leading-relaxed text-white tracking-wide text-left drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                            ${gossip.snippet}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10 select-none">
+                        <div class="flex flex-col">
+                            <span class="text-[8px] font-bold text-white/50 uppercase tracking-widest">DRAMA INDEX</span>
+                            <span class="text-sm font-semibold">${chilis}</span>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-[8px] font-bold text-white/50 uppercase tracking-widest font-mono">SCOOP ID</span>
+                            <span class="text-xs font-mono text-white/90">#${gossip.id}0${targetIndex}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+                if (i === 0) {
+                    activeCardRef = card;
+                }
+            }
+        }
+
+        // Setup Tactile Touch & Swipe Gestures
+        function setupGestureSwiper() {
+            // Mouse Drag Listeners
+            window.addEventListener('mousedown', dragStart);
+            window.addEventListener('mousemove', dragMove);
+            window.addEventListener('mouseup', dragEnd);
+
+            // Touch Listeners
+            window.addEventListener('touchstart', dragStart, { passive: true });
+            window.addEventListener('touchmove', dragMove, { passive: false });
+            window.addEventListener('touchend', dragEnd);
+        }
+
+        function dragStart(e) {
+            if (activeTabIndex !== 0) return; // Only allow card swiping on the main Home screen
+            if (e.target.closest('button') || e.target.closest('select') || e.target.closest('textarea')) return;
+
+            isSwiping = true;
+            if (activeCardRef) {
+                activeCardRef.classList.remove('ios-spring');
+            }
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        }
+
+        function dragMove(e) {
+            if (!isSwiping || !activeCardRef) return;
+
+            const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            deltaX = currentX - startX;
+
+            // Restrict right drag (stiff bounce back feedback) — only leftward swipes are allowed through
+            if (deltaX > 0) {
+                deltaX = deltaX * 0.15;
+            }
+
+            const rotation = deltaX * 0.04;
+            activeCardRef.style.transform = `translate(${deltaX}px, 0px) rotate(${rotation}deg)`;
+        }
+
+        function dragEnd() {
+            if (!isSwiping || !activeCardRef) return;
+            isSwiping = false;
+
+            const threshold = -110;
+
+            if (deltaX < threshold) {
+                // Read Next Transition (Slides current card off-screen to the left)
+                activeCardRef.classList.add('swipe-left-exit');
+                triggerLightHaptic();
+                cycleCardNext();
+            } else {
+                // Spring back animation
+                activeCardRef.classList.add('ios-spring');
+                activeCardRef.style.transform = '';
+            }
+
+            deltaX = 0;
+        }
+
+        function cycleCardNext() {
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex + 1) % database.length;
+                renderDeckStack();
+            }, 400);
+        }
+
+        // Heavy "Spread Viral" Action (🔥)
+        function triggerSpreadActive() {
+            if (database.length === 0) return;
+
+            const gossip = database[currentCardIndex];
+            gossip.clout += Math.floor(Math.random() * 120) + 60;
+            userSpreadsCount += 1;
+            document.getElementById('user-spreads-counter').innerText = userSpreadsCount;
+
+            // Trigger immersive explosive confetti
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.75 },
+                colors: ['#ff453a', '#ff9f0a', '#ffd60a', '#30d5c8']
+            });
+
+            renderToast("VIRAL OVERLOAD! GOSSIP BOOSTED", "🔥");
+
+            // Slide out the active card to load next scoop
+            if (activeCardRef) {
+                activeCardRef.classList.add('swipe-left-exit');
+                cycleCardNext();
+            }
+        }
+
+        // Slide-up Spill Wizard Form Controllers
+        function openSpillWizard() {
+            const modal = document.getElementById('spill-modal');
+            const card = document.getElementById('spill-modal-card');
+            modal.classList.remove('pointer-events-none', 'opacity-0');
+            card.classList.remove('translate-y-full');
+            updateStateHighlight();
+            triggerLightHaptic();
+        }
+
+        // Color-codes the Gossip State box to add drama as the user picks a state
+        function updateStateHighlight() {
+            const select = document.getElementById('spill-state');
+            const box = document.getElementById('spill-state-box');
+            const state = select.value;
+
+            // Reset to base, then apply state-specific drama coloring
+            box.className = "p-4 rounded-2xl transition-colors duration-300 border";
+            select.className = "w-full bg-transparent text-xs font-extrabold focus:outline-none cursor-pointer";
+
+            if (state === "LOWKEY VERIFIED") {
+                box.classList.add('bg-emerald-500/10', 'border-emerald-500/40');
+                select.classList.add('text-emerald-400');
+            } else if (state === "DEFINITELY DISCUSSED") {
+                box.classList.add('bg-amber-500/10', 'border-amber-500/40');
+                select.classList.add('text-amber-400');
+            } else if (state === "STILL STIRRING UP") {
+                box.classList.add('bg-[#ff2d55]/10', 'border-[#ff2d55]/50');
+                select.classList.add('text-[#ff2d55]');
+            }
+        }
+
+        function closeSpillWizard() {
+            const modal = document.getElementById('spill-modal');
+            const card = document.getElementById('spill-modal-card');
+            modal.classList.add('pointer-events-none', 'opacity-0');
+            card.classList.add('translate-y-full');
+            triggerLightHaptic();
+        }
+
+        function setupTextCounter() {
+            const ta = document.getElementById('spill-text');
+            ta.addEventListener('input', () => {
+                document.getElementById('spill-char-counter').innerText = `${ta.value.length}/400`;
+            });
+        }
+
+        function submitNewGossip(e) {
+            e.preventDefault();
+            const text = document.getElementById('spill-text').value.trim();
+            const drama = parseInt(document.getElementById('spill-drama').value);
+            const state = document.getElementById('spill-state').value;
+
+            if (text.length < 15) {
+                renderToast("Gossip must be at least 15 chars.", "⚠️");
+                return;
+            }
+
+            // High-fidelity random liquid gradient generator
+            const gradients = [
+                "from-purple-700 via-pink-600 to-[#ff453a]",
+                "from-[#ff453a] via-orange-600 to-amber-500",
+                "from-teal-600 via-emerald-500 to-cyan-500",
+                "from-indigo-600 via-violet-600 to-fuchsia-500"
+            ];
+            const chosenGradient = gradients[Math.floor(Math.random() * gradients.length)];
+
+            const newGossip = {
+                id: Date.now().toString().slice(-4),
+                snippet: text,
+                drama: drama,
+                state: state,
+                gradientClass: chosenGradient,
+                clout: 10
+            };
+
+            // Inject secret at the top of the queue for immediate swipe testing
+            database.splice(currentCardIndex, 0, newGossip);
+
+            // Increment Profile Counter
+            userSpillsCount += 1;
+            document.getElementById('user-spills-counter').innerText = userSpillsCount;
+
+            closeSpillWizard();
+            renderDeckStack();
+
+            // Reset form UI
+            document.getElementById('spill-wizard-form').reset();
+            document.getElementById('spill-char-counter').innerText = "0/400";
+
+            renderToast("Launched successfully to the Live Deck! 🤫", "✨");
+        }
+
+        // Apple Tactile Toast Controller
+        function renderToast(message, icon = "✨") {
+            const toast = document.getElementById('toast-messenger');
+            const txt = document.getElementById('toast-text');
+            const ico = document.getElementById('toast-icon');
+
+            txt.innerText = message;
+            ico.innerText = icon;
+
+            toast.style.transform = "translateY(0px) translateX(-50%)";
+            toast.style.opacity = "1";
+
+            setTimeout(() => {
+                toast.style.transform = "translateY(-100px) translateX(-50%)";
+                toast.style.opacity = "0";
+            }, 3000);
+        }
+
+        // Simulate Subtle Apple Tactile/Haptic Feedback
+        function triggerLightHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate(12); // Short elegant micro-buzz
+            }
+        }
+
+        // Dynamic interactions for Communities/Direct Chats
+        function openCommunity(commName) {
+            renderToast(`Entered secure channel ${commName}...`, "📡");
+            triggerLightHaptic();
+        }
+
+        function openSecureChat(chatName) {
+            renderToast(`Syncing message history with ${chatName}...`, "🔒");
+            triggerLightHaptic();
+        }
+
+        function promoteTrending(index) {
+            renderToast(`Uprating topic relevance in core registry!`, "🚀");
+            triggerLightHaptic();
+        }
+    </script>
+</body>
+</html>
